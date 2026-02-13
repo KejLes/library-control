@@ -18,14 +18,21 @@ public class User implements Localizable {
             this.inside = true;
             this.nEntries++;
         }
-        else if(e == EventType.EXIT && this.inside){
+        else if(e == EventType.EXIT && this.inside)
             this.inside = false;
-        }
     }
 
     public Integer getNEntries(){
         return this.nEntries;
     }
 
-    //TODO
+	public Boolean isInside()
+	{
+		return (inside);
+	}
+
+	public int getIDNumber()
+    {
+        return(Integer.parseInt(id.substring(1)));
+    }
 }

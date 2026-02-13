@@ -2,6 +2,7 @@ package pio.daw;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 public class App {
     /**
@@ -12,13 +13,25 @@ public class App {
      * @return Path to file if exists.
      */
     public static Path getPathFromArgs(String[] args){
+		if (args.length != 1)
+		{
+			System.err.println("Se espera un único argumento que es la ruta del texto");
+			System.exit(0);
+		}
         Path p = Paths.get(args[0]);
         return (p);
     }
 
     public static void main(String[] args) {
         Path p = getPathFromArgs(args);
-        Controlable controler = Library.fromFile(p);
-        controler.printResume();
+		try (Scanner sc = new Scanner(p)){
+			String str;
+			while (sc.hasNext()) {
+				str = sc.nextLine();
+				System.out.println(str);
+			}
+		} catch (Exception e) {
+			System.err.println("Fallo con Scanner y / o el archivo");
+		}
     }
 }
