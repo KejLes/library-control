@@ -9,21 +9,20 @@ public class User implements Localizable {
         this.id = id;
     }
 
-    public String getId(){
-        return this.id;
-    }
-
     public void registerNewEvent(EventType e){
-        if(e == EventType.ENTRY && !this.inside){
-            this.inside = true;
+		if(e == EventType.ENTRY && !this.inside){
+			this.inside = true;
             this.nEntries++;
         }
         else if(e == EventType.EXIT && this.inside)
             this.inside = false;
-    }
-
+	}
+	public String getId(){
+		return (this.id);
+	}
+	
     public Integer getNEntries(){
-        return this.nEntries;
+        return (this.nEntries);
     }
 
 	public Boolean isInside()
