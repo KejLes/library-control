@@ -17,6 +17,8 @@ public class App {
     }
 
     public static void main(String[] args) {
+		if(args.length != 1)
+			throw Exception;
         Path p = getPathFromArgs(args);
         Controlable controler = Library.fromFile(p);
         controler.printResume();
