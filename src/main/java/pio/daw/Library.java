@@ -2,7 +2,6 @@ package pio.daw;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,7 @@ public class Library implements Controlable {
 					e = EventType.EXIT;
 				library.registerChange(id, e);
 			}
+
 		} catch (Exception o) {
 			System.err.println("Ha habido un fallo al leer el archivo");
 			System.exit(0);
@@ -44,11 +44,19 @@ public class Library implements Controlable {
         return (library);
     }
 
+	/**
+	 * Constructor, just initialize both fields
+	 */
     private Library(){
         this.users = new HashMap<>();
 		this.usersList = null;
     }
 
+	/**
+	 * A auxiliar method while its reading the input (txt), it's for save or
+	 * update a new user with the corresponding state if it is inside the library
+	 */
+	@Override
     public void registerChange(String id, EventType e){
         User u = this.users.get(id);
         if(u == null)
@@ -57,48 +65,30 @@ public class Library implements Controlable {
         this.users.put(id, u);
     }
 
+	/**
+	 * Basiclly, it converts the HashMap to an ArrayList
+	 */
 	public void convert_HashMap_to_Arraylist()
 	{
 		this.usersList = new ArrayList<>();
-		ArrayList<User> usersList = new ArrayList<>();
 		for (Map.Entry<String, User> u : users.entrySet())
 			usersList.add(u.getValue());
 		sortArraylist();
 	}
 
+	/**
+	 * Sort the ArrayList
+	 */
 	private void sortArraylist()
 	{
-		ArrayList<User> sorted_users = new ArrayList<>();
-		User lowest_user;
-
-		lowest_user = usersList.get(0);
-		for(int i = 0; i < usersList.size(); i++)
-		{
-			if (usersList.get(i).getIDNumber() < lowest_user.getIDNumber())
-				lowest_user = usersList.get(i);
-			if (i == usersList.size() - 1)
-			{
-				i = 0;
-				//	Guardar el lowestUser en sorted_users;
-				for (int j = 0; j < usersList.size(); j++)
-				{
-					if (usersList.get(j).getIDNumber() == lowest_user.getIDNumber())
-					{
-						sorted_users.add(lowest_user);
-						usersList.remove(j);
-						break;
-					}
-				}
-				//	El siguitne lowestUser será el primer elemento serça el primero en usersList si todavía hay elementos
-				if(!users.isEmpty())
-					lowest_user = usersList.get(0);
-			}
-		}
-		usersList = sorted_users;
-		sorted_users = null;
+		usersList.sort((a, b) -> Integer.compare(a.getIDNumber(), b.getIDNumber()));
 	}
 
-    public List<User> getCurrentInside()
+	/**
+	 * Get a List of all the users that are inside, so the field of inside is true
+	 */
+	@Override
+	public List<User> getCurrentInside()
 	{
 		ArrayList<User> usersInside = new ArrayList<>();
 		for (int i = 0; i < usersList.size(); i++)
@@ -109,8 +99,15 @@ public class Library implements Controlable {
 		return (usersInside);
 	}
 
+	/**
+	 * Get the user or users with max entries in the library.
+	 * How it can be various users, it is a list.
+	 */
+	@Override
     public List<User> getMaxEntryUsers()
 	{
+		if (usersList == null)
+			convert_HashMap_to_Arraylist();
 		ArrayList<User> usersWMaxEntries = new ArrayList<>();
 		int	maxEntries = -1;
 		for (int i = 0; i < usersList.size(); i++)
@@ -126,6 +123,10 @@ public class Library implements Controlable {
 		return (usersWMaxEntries);
 	}
 
+	/**
+	 * If is not created the list, calls method convert_HashMap_to_ArrayList(), and returns de list.
+	 */
+	@Override
     public List<User> getUserList()
 	{
 		if (usersList == null)
@@ -133,26 +134,38 @@ public class Library implements Controlable {
 		return (usersList);
 	}
 
+	/**
+	 * Calls some functions that returns lists with the required information
+	 * and print all the information
+	 *
+	 * The called methods are:
+	 * 		getCurrentInside() : List
+	 * 		getMaxEntryUsers() : List
+	 */
+	@Override
     public void printResume()
 	{
-		ArrayList<User> usersInsideList = new ArrayList<>(getCurrentInside());
-		ArrayList<User> usersList = new ArrayList<>(getUserList());
-		ArrayList<User> maxEntryUsersList = new ArrayList<>(getMaxEntryUsers());
+		getUserList();
+		List<User> usersInsideList = getCurrentInside();
+		List<User> maxEntryUsersList = getMaxEntryUsers();
 
-		System.out.println("Usuarios actualmente dentro de la biblioteca:");
+		System.out.print("Usuarios actualmente dentro de la biblioteca:\n");
 		for(int i = 0; i < usersInsideList.size(); i++)
-			System.out.println(usersInsideList.get(i).getId());
+			System.out.print(usersInsideList.get(i).getId() + "\n");
 
-		System.out.println("\nNúmero de entradas por usuario:");
+		System.out.print("\nNúmero de entradas por usuario:\n");
 		for(int i = 0; i < usersList.size(); i++)
-			System.out.println(usersList.get(i).getId() + " -> " + usersList.get(i).getNEntries());
+		{
+			if (usersList.get(i).getNEntries() == 0)	// Lo he pueseto porque en el ejmplo el U004 solo sale y tiene como numero de entradas = 0, y no aparece en el test
+				continue;
+			System.out.print(usersList.get(i).getId() + " -> " + usersList.get(i).getNEntries() + "\n");
+		}
 
-		System.out.println("\nUsuario(s) con más entradas:");
+		System.out.print("\nUsuario(s) con más entradas:\n");
 		for(int i = 0; i < maxEntryUsersList.size(); i++)
-			System.out.println(maxEntryUsersList.get(i).getId());
+			System.out.print(maxEntryUsersList.get(i).getId() + "\n");
 
-		usersInsideList		= null;
-		usersList			= null;
+		usersInsideList		= null;		// Es la costumbre de hacer free xd
 		maxEntryUsersList	= null;
 	}
 }
